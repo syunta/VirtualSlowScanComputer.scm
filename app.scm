@@ -147,6 +147,17 @@
               (int->uint (adr pg) adr-length))
       (int->uint (data pg) mem-length)))
 
+  (define (run CPU RAM)
+    (fetch CPU RAM))
+
+  (define (fetch CPU RAM)
+    (save-isr CPU (load-ram RAM (pc CPU)))
+    (next-pc CPU)
+    (decode CPU RAM))
+
+  (define (next-pc CPU)
+    (save-pc CPU (uint-inc (pc CPU))))
+
   ;run program
   (let ((RAM (ready program (init-RAM))))
     (run (init-CPU) RAM)))
