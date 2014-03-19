@@ -158,6 +158,10 @@
   (define (next-pc CPU)
     (save-pc CPU (uint-inc (pc CPU))))
 
+  (define (decode CPU RAM)
+    (let ((op (opcode (isr CPU))))
+      (exec (op->fn op) CPU RAM)))
+
   ;run program
   (let ((RAM (ready program (init-RAM))))
     (run (init-CPU) RAM)))
