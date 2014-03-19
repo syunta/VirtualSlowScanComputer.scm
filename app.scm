@@ -50,6 +50,64 @@
                 (cons '(#t #t #f) srl    )
                 (cons '(#t #t #t) svc    )))
 
+  ;data selector
+  (define (acc CPU)
+    (cdr (assoc 'ACC CPU)))
+
+  (define (isr CPU)
+    (cdr (assoc 'ISR CPU)))
+
+  (define (pc CPU)
+    (cdr (assoc 'PC CPU)))
+
+  (define (ovf CPU)
+    (cdr (assoc 'OVF CPU)))
+
+  (define (ram-length RAM)
+    (vector-length RAM))
+
+  (define (load-ram RAM n)
+    (vector-ref RAM (uint->int n)))
+
+  (define (read-line program)
+    (car program))
+
+  (define (next-line program)
+    (cdr program))
+
+  (define (opcode pg-or-bin)
+    (define (op-pg pg)
+      (car pg))
+    (define (op-bin bin n op)
+      (if (= n 0)
+        (reverse op)
+        (op-bin (cdr bin) (- n 1) (cons (car bin) op))))
+    (if (boolean? (car pg-or-bin))
+      (op-bin pg-or-bin op-length nil)
+      (op-pg pg-or-bin)))
+
+  (define (adr pg-or-bin)
+    (define (adr-pg pg)
+      (cadr pg))
+    (define (adr-bin bin n)
+      (if (= n op-length)
+        bin
+        (adr-bin (cdr bin) (+ n 1))))
+    (if (boolean? (car pg-or-bin))
+      (adr-bin pg-or-bin 0)
+      (adr-pg pg-or-bin)))
+
+  (define (data pg)
+    (car pg))
+
+  (define (op->uint op)
+    (hash-table-get oplist op))
+
+  (define (op+adr op adr)
+    (append op adr))
+
+  (define (op->fn op)
+    (hash-table-get funclist op))
 
   ;run program
   (let ((RAM (ready program (init-RAM))))
