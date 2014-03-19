@@ -215,6 +215,10 @@
            (print (uint->int (acc CPU))))
           (else (error 2))))
 
+  (define (exec fn CPU RAM)
+    (fn CPU RAM)
+    (run CPU RAM))
+
   ;run program
   (let ((RAM (ready program (init-RAM))))
     (run (init-CPU) RAM)))
