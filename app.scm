@@ -132,6 +132,15 @@
   (define (save-ovf CPU bin)
     (set-cdr! (assoc 'OVF CPU) (list bin)))
 
+  ;processor engine
+  (define (ready pg RAM)
+    (let loop ((pg pg) (RAM RAM) (n 0))
+      (cond ((null? pg) RAM)
+            ((= n (ram-length RAM)) (error 1))
+            (else
+              (save-ram RAM n (assemble (read-line pg)))
+              (loop (next-line pg) RAM (+ n 1))))))
+
   ;run program
   (let ((RAM (ready program (init-RAM))))
     (run (init-CPU) RAM)))
