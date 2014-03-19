@@ -141,6 +141,12 @@
               (save-ram RAM n (assemble (read-line pg)))
               (loop (next-line pg) RAM (+ n 1))))))
 
+  (define (assemble pg)
+    (if (instruction? pg)
+      (op+adr (op->uint (opcode pg))
+              (int->uint (adr pg) adr-length))
+      (int->uint (data pg) mem-length)))
+
   ;run program
   (let ((RAM (ready program (init-RAM))))
     (run (init-CPU) RAM)))
