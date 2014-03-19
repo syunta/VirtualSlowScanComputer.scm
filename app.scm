@@ -109,6 +109,13 @@
   (define (op->fn op)
     (hash-table-get funclist op))
 
+  ;data predicate
+  (define (instruction? pg)
+    (not (null? (cdr pg))))
+
+  (define (ov? ovf)
+    (car ovf))
+
   ;run program
   (let ((RAM (ready program (init-RAM))))
     (run (init-CPU) RAM)))
