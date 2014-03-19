@@ -219,6 +219,14 @@
     (fn CPU RAM)
     (run CPU RAM))
 
+  (define (halt CPU RAM)
+    (exit))
+
+  (define (error n)
+    (cond ((= n 1) (print "ERROR: out of memory") (exit))
+          ((= n 2) (print "ERROR: svc required 0 or 1 or 2") (exit))
+          (else (print "ERROR: unexpected error") (exit))))
+
   ;run program
   (let ((RAM (ready program (init-RAM))))
     (run (init-CPU) RAM)))
