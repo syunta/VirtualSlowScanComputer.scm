@@ -116,6 +116,22 @@
   (define (ov? ovf)
     (car ovf))
 
+  ;data setter
+  (define (save-ram RAM n bin)
+    (vector-set! RAM n bin))
+
+  (define (save-acc CPU bin)
+    (set-cdr! (assoc 'ACC CPU) bin))
+
+  (define (save-isr CPU bin)
+    (set-cdr! (assoc 'ISR CPU) bin))
+
+  (define (save-pc CPU bin)
+    (set-cdr! (assoc 'PC CPU) bin))
+
+  (define (save-ovf CPU bin)
+    (set-cdr! (assoc 'OVF CPU) (list bin)))
+
   ;run program
   (let ((RAM (ready program (init-RAM))))
     (run (init-CPU) RAM)))
