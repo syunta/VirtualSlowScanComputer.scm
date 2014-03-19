@@ -162,6 +162,59 @@
     (let ((op (opcode (isr CPU))))
       (exec (op->fn op) CPU RAM)))
 
+  (define (jump CPU RAM)
+    (if (not (ov? (ovf CPU)))
+      (save-pc CPU (adr (isr CPU)))))
+
+  (define (add CPU RAM)
+    (receive
+      (result ovf) (uint-add (acc CPU) (load-ram RAM (adr (isr CPU))))
+      (save-acc CPU result)
+      (save-ovf CPU ovf)))
+
+  (define (sub CPU RAM)
+    (receive
+      (result ovf) (uint-sub (acc CPU) (load-ram RAM (adr (isr CPU))))
+      (save-acc CPU result)
+      (save-ovf CPU ovf)))
+
+  (define (load-m CPU RAM)
+    (save-acc CPU (load-ram RAM (adr (isr CPU)))))
+
+  (define (store CPU RAM)
+    (save-ram RAM (uint->int (adr (isr CPU))) (acc CPU)))
+
+  (define (sll CPU RAM)
+    (let loop ((n (uint->int (adr (isr CPU)))))
+      (cond ((= n 0)) ;loop end
+            ((ov? (ovf CPU))) ;loop end
+            (else (receive
+                    (result ovf) (uint-sll (acc CPU))
+                    (save-acc CPU result)
+                    (save-ovf CPU ovf)
+                    (loop (- n 1)))))))
+
+  (define (srl CPU RAM)
+    (let loop ((n (uint->int (adr (isr CPU)))))
+      (cond ((= n 0)) ;loop end
+            ((ov? (ovf CPU))) ;loop end
+            (else (receive
+                    (result ovf) (uint-srl (acc CPU))
+                    (save-acc CPU result)
+                    (save-ovf CPU ovf)
+                    (loop (- n 1)))))))
+
+  (define (svc CPU RAM)
+    (cond ((= 0 (uint->int (adr (isr CPU))))
+           (halt CPU RAM))
+          ((= 1 (uint->int (adr (isr CPU))))
+           (print "Input a natural number")
+           (save-acc CPU (int->uint (read) mem-length)))
+          ((= 2 (uint->int (adr (isr CPU))))
+           (print "Computed result is ...")
+           (print (uint->int (acc CPU))))
+          (else (error 2))))
+
   ;run program
   (let ((RAM (ready program (init-RAM))))
     (run (init-CPU) RAM)))
